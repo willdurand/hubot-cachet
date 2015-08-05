@@ -1,24 +1,34 @@
-# hubot-cachet
+hubot-cachet
+============
 
-A hubot script to manage incidents/statuses with Cachet
+A hubot script to manage incidents/statuses with Cachet.
 
 See [`src/cachet.coffee`](src/cachet.coffee) for full documentation.
 
-## Installation
+Installation
+------------
 
 In hubot project repo, run:
 
-`npm install hubot-cachet --save`
+    npm install hubot-cachet --save
 
 Then add **hubot-cachet** to your `external-scripts.json`:
 
 ```json
-["hubot-cachet"]
+[
+    "hubot-cachet"
+]
 ```
 
-## Sample Interaction
+Usage
+-----
 
 ```
-user1>> hubot hello
-hubot>> hello!
+hubot help cachet
 ```
+
+License
+-------
+
+hubot-cachet is released under the MIT License. See the bundled LICENSE file for
+details.
