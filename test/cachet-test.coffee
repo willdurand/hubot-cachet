@@ -9,6 +9,10 @@ describe 'cachet', ->
     @robot =
       respond: sinon.spy()
       hear: sinon.spy()
+      brain:
+        on: (_, cb) ->
+          cb()
+        data: {}
 
     require('../src/cachet')(@robot)
 

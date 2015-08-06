@@ -26,10 +26,9 @@ _components = {}
 
 module.exports = (robot) ->
 
-  if robot.brain?
-    robot.brain.on 'loaded', ->
-      if robot.brain.data.cachet_components?
-        _components = robot.brain.data.cachet_components
+  robot.brain.on 'loaded', ->
+    if robot.brain.data.cachet_components?
+      _components = robot.brain.data.cachet_components
 
   robot.respond /cachet status/i, (msg) ->
     results = []
