@@ -6,7 +6,8 @@
 #   HUBOT_CACHET_API_TOKEN
 #
 # Commands:
-#   hubot cachet status
+#   hubot cachet status <red|orange|yellow|green> <component name>
+#   hubot cachet component status
 #   hubot cachet component set <component name> <id>
 #   hubot cachet component list
 #   hubot cachet component flushall
@@ -42,6 +43,12 @@ module.exports = (robot) ->
     Watching: 3,
     Fixed: 4
 
+  ComponentStatus =
+    Operational: 1,
+    PerformanceIssue: 2,
+    PartialOutage: 3,
+    MajorOutage: 4
+
   declareIncident = (component_name, incident_name, incident_msg, status, msg) ->
     component_id  = _components[component_name] ? 0
     incident_name = component_name if component_id == 0
@@ -65,11 +72,45 @@ module.exports = (robot) ->
           json     = JSON.parse body
           incident = json.data
 
-          msg.send "Incident \##{incident.id} declared"
+          msg.send [
+            "Incident `\##{incident.id}` declared.",
+            'You might want to change the component status now.'
+          ].join ' '
+
+  changeComponentStatus = (component_name, status, msg) ->
+    component_id = _components[component_name] ? 0
+
+    if component_id == 0
+      msg.reply "Component '#{component_name}' not registered"
+
+    data = JSON.stringify { status: status }
+
+    msg
+      .http("#{url}/components/#{component_id}")
+      .header('X-Cachet-Token', token)
+      .header('Content-Type', 'application/json')
+      .put(data) (err, res, body) ->
+        if err
+          msg.send err
+        else
+          json     = JSON.parse body
+          component = json.data
+
+          msg.send "#{component.name} status changed to: *#{component.status_name}*"
 
   # Listeners
 
-  robot.respond /cachet status/i, (msg) ->
+  robot.respond /cachet status (red|orange|yellow|green) ([a-zA-Z0-9 ]+)/i, (msg) ->
+    component_name = msg.match[2]
+    status          = switch
+      when msg.match[1] == 'red'    then ComponentStatus.MajorOutage
+      when msg.match[1] == 'orange' then ComponentStatus.PartialOutage
+      when msg.match[1] == 'yellow' then ComponentStatus.PerformanceIssue
+      when msg.match[1] == 'green'  then ComponentStatus.Operational
+
+    changeComponentStatus component_name, status, msg
+
+  robot.respond /cachet component status/i, (msg) ->
     results = []
     msg
       .http("#{url}/components")
@@ -99,16 +140,15 @@ module.exports = (robot) ->
 
     _components[name] = id
     robot.brain.data.cachet_components = _components
-    msg.send "The component '#{name}' with id equals to #{id} has been set"
+    msg.send "The component '#{name}' (id = #{id}) has been set"
 
   robot.respond /cachet component list/i, (msg) ->
-    # TODO: contains items?
     if _components?
       results = []
       for name of _components
         results.push "#{name} with id = #{_components[name]}"
 
-    if results.size > 0
+    if results.length > 0
       msg.send results.join '\n'
       return
 
@@ -125,7 +165,7 @@ module.exports = (robot) ->
     incident_name  = "Investigating issue on #{component_name}"
 
     declareIncident component_name, incident_name, incident_msg, \
-                     IncidentStatus.Investigating,msg
+                     IncidentStatus.Investigating, msg
 
   robot.respond /incident identified on ([a-zA-Z0-9 ]+): (.+)/i, (msg) ->
     component_name = msg.match[1]
