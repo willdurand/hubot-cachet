@@ -35,7 +35,8 @@ IncidentStatus =
   Fixed: 4
 
 declare_incident = (component_name, incident_name, incident_msg, status, msg) ->
-  component_id = _components[component_name] ? 0
+  component_id  = _components[component_name] ? 0
+  incident_name = component_name if component_id == 0
 
   data = JSON.stringify {
     name: incident_name,
