@@ -6,8 +6,6 @@ Status](https://travis-ci.org/willdurand/hubot-cachet.svg?branch=master)](https:
 
 A hubot script to manage incidents/statuses with [Cachet](https://cachethq.io).
 
-See [`src/cachet.coffee`](src/cachet.coffee) for full documentation.
-
 Installation
 ------------
 
@@ -32,11 +30,13 @@ Most of the commands are available under the `cachet` namespace:
 hubot help cachet
 ```
 
-For simplicity purpose, incidents are managed with this namespace:
+For simplicity purpose, incidents are managed without this namespace:
 
 ```
 hubot help incident
 ```
+
+See [`src/cachet.coffee`](src/cachet.coffee) for full documentation.
 
 ### Screenshots
 
