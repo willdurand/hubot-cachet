@@ -20,7 +20,7 @@ describe 'cachet', ->
     it "should respond to '#{command}'", ->
       expect(@robot.respond).to.have.been.calledWith(command)
 
-  shouldRespondTo /cachet status (red|orange|yellow|green) ([a-zA-Z0-9 ]+)/i
+  shouldRespondTo /cachet status (red|orange|blue|green) ([a-zA-Z0-9 ]+)/i
   shouldRespondTo /cachet component status/i
   shouldRespondTo /cachet component list/i
   shouldRespondTo /cachet component flushall/i

@@ -5,19 +5,20 @@
 #   HUBOT_CACHET_API_URL
 #   HUBOT_CACHET_API_TOKEN
 #
-# Commands:
-#   hubot cachet status <red|orange|yellow|green> <component name>
-#   hubot cachet component status
-#   hubot cachet component set <component name> <id>
-#   hubot cachet component list
-#   hubot cachet component flushall
-#   hubot incident investigating on <component name>: <incident message>
-#   hubot incident identified on <component name>: <incident message>
-#   hubot incident watching on <component name>: <incident message>
-#   hubot incident fixed on <component name>: <incident message>
+#  Commands:
+#   hubot cachet status <red|orange|blue|green> <component name> - Change the  component status
+#   hubot cachet component status - Print all components along with their statuses
+#   hubot cachet component set <component name> <id> - Register a component into my brain
+#   hubot cachet component list - List all registered components into my brain (i.e. Cachet could own more components)
+#   hubot cachet component flushall - Remove all registered components from my brain
+#   hubot incident investigating on <component name>: <incident message> - Declare an incident on a component (or anything else if it cannot be linked to an existing compoenent) when it experiences an issue
+#   hubot incident identified on <component name>: <incident message> - Declare an incident when you find the (root) cause of the current issue
+#   hubot incident watching on <component name>: <incident message> - Declare an incident when you monitor changes due to an outage for instance
+#   hubot incident fixed on <component name>: <incident message> - Declare an incident when things are fixed
 #
 # Notes:
-#   <optional notes required for the script>
+#   Components MUST be registered with `cachet component set` before being able
+#   to use them (e.g. `<component name>`).
 #
 # Author:
 #   William Durand
@@ -67,7 +68,7 @@ module.exports = (robot) ->
       .header('Content-Type', 'application/json')
       .post(data) (err, res, body) ->
         if err
-          msg.send err
+          msg.reply err
         else
           json     = JSON.parse body
           incident = json.data
@@ -81,7 +82,17 @@ module.exports = (robot) ->
     component_id = _components[component_name] ? 0
 
     if component_id == 0
-      msg.reply "Component '#{component_name}' not registered"
+      names = []
+      for name of _components
+        names.push name
+
+      msg.reply [
+        "Component '#{component_name}' is not registered. ",
+        'Available components are: ',
+        names.join(', '),
+        '.'
+      ].join ''
+      return
 
     data = JSON.stringify { status: status }
 
@@ -91,7 +102,7 @@ module.exports = (robot) ->
       .header('Content-Type', 'application/json')
       .put(data) (err, res, body) ->
         if err
-          msg.send err
+          msg.reply err
         else
           json     = JSON.parse body
           component = json.data
@@ -100,12 +111,12 @@ module.exports = (robot) ->
 
   # Listeners
 
-  robot.respond /cachet status (red|orange|yellow|green) ([a-zA-Z0-9 ]+)/i, (msg) ->
+  robot.respond /cachet status (red|orange|blue|green) ([a-zA-Z0-9 ]+)/i, (msg) ->
     component_name = msg.match[2]
     status          = switch
       when msg.match[1] == 'red'    then ComponentStatus.MajorOutage
       when msg.match[1] == 'orange' then ComponentStatus.PartialOutage
-      when msg.match[1] == 'yellow' then ComponentStatus.PerformanceIssue
+      when msg.match[1] == 'blue'   then ComponentStatus.PerformanceIssue
       when msg.match[1] == 'green'  then ComponentStatus.Operational
 
     changeComponentStatus component_name, status, msg
@@ -117,7 +128,7 @@ module.exports = (robot) ->
       .headers('X-Cachet-Token': token)
       .get() (err, res, body) ->
         if err
-          msg.send err
+          msg.reply err
         else
           try
             json = JSON.parse body
