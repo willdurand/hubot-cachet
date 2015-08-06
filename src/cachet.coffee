@@ -70,13 +70,16 @@ module.exports = (robot) ->
         if err
           msg.reply err
         else
-          json     = JSON.parse body
-          incident = json.data
+          try
+            json     = JSON.parse body
+            incident = json.data
 
-          msg.send [
-            "Incident `\##{incident.id}` declared.",
-            'You might want to change the component status now.'
-          ].join ' '
+            msg.send [
+              "Incident `\##{incident.id}` declared.",
+              'You might want to change the component status now.'
+            ].join ' '
+          catch e
+            msg.reply "Error: #{e}"
 
   changeComponentStatus = (component_name, status, msg) ->
     component_id = _components[component_name] ? 0
@@ -104,10 +107,13 @@ module.exports = (robot) ->
         if err
           msg.reply err
         else
-          json     = JSON.parse body
-          component = json.data
+          try
+            json     = JSON.parse body
+            component = json.data
 
-          msg.send "#{component.name} status changed to: *#{component.status_name}*"
+            msg.send "#{component.name} status changed to: *#{component.status_name}*"
+          catch e
+            msg.reply "Error: #{e}"
 
   # Listeners
 
@@ -143,7 +149,7 @@ module.exports = (robot) ->
             else
               msg.send results.join '\n'
           catch e
-            msg.send "Error: #{e}"
+            msg.reply "Error: #{e}"
 
   robot.respond /cachet component set ([a-zA-Z0-9 ]+) ([0-9]+)/i, (msg) ->
     name = msg.match[1]
@@ -154,16 +160,15 @@ module.exports = (robot) ->
     msg.send "The component '#{name}' (id = #{id}) has been set"
 
   robot.respond /cachet component list/i, (msg) ->
-    if _components?
-      results = []
-      for name of _components
-        results.push "#{name} with id = #{_components[name]}"
+    results = []
+    for name of _components
+      results.push "#{name} with id = #{_components[name]}"
 
-    if results.length > 0
-      msg.send results.join '\n'
+    if results?.length < 1
+      msg.send 'No component found'
       return
 
-    msg.send 'No component found'
+    msg.send results.join '\n'
 
   robot.respond /cachet component flushall/i, (msg) ->
     _components = {}
