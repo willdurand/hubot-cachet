@@ -10,13 +10,13 @@ Installation
 
 In hubot project repo, run:
 
-    npm install hubot-cachet --save
+    npm install hubot-cachethq --save
 
-Then add **hubot-cachet** to your `external-scripts.json`:
+Then add **hubot-cachethq** to your `external-scripts.json`:
 
 ```json
 [
-    "hubot-cachet"
+    "hubot-cachethq"
 ]
 ```
 

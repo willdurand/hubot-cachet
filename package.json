@@ -1,19 +1,19 @@
 {
-  "name": "hubot-cachet",
+  "name": "hubot-cachethq",
   "description": "A hubot script to manage incidents/statuses with Cachet",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "author": "William Durand <will+git@drnd.me>",
   "license": "MIT",
 
-  "keywords": ["hubot","hubot-scripts","cachet","incident","status"],
+  "keywords": ["hubot","hubot-scripts","cachet","incident","status","cachethq"],
 
   "repository": {
     "type": "git",
-    "url": "git://github.com/hubot-scripts/hubot-cachet.git"
+    "url": "git://github.com/willdurand/hubot-cachet.git"
   },
 
   "bugs": {
-    "url": "https://github.com/hubot-scripts/hubot-cachet/issues"
+    "url": "https://github.com/willdurand/hubot-cachet/issues"
   },
 
   "dependencies": {
