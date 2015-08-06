@@ -7,10 +7,13 @@
 #
 # Commands:
 #   hubot cachet status
-#   hubot cachet component set <name> <id>
+#   hubot cachet component set <component name> <id>
 #   hubot cachet component list
 #   hubot cachet component flushall
-#   hubot investigating issue on <component name>: <incident name>
+#   hubot incident investigating on <component name>: <incident message>
+#   hubot incident identified on <component name>: <incident message>
+#   hubot incident watching on <component name>: <incident message>
+#   hubot incident fixed on <component name>: <incident message>
 #
 # Notes:
 #   <optional notes required for the script>
@@ -23,6 +26,37 @@ url   = URL.format(URL.parse(process.env.HUBOT_CACHET_API_URL ? ""))
 token = process.env.HUBOT_CACHET_API_TOKEN ? ""
 
 _components = {}
+
+IncidentStatus =
+  Scheduled: 0,
+  Investigating: 1,
+  Identified: 2,
+  Watching: 3,
+  Fixed: 4
+
+declare_incident = (component_name, incident_name, incident_msg, status, msg) ->
+  component_id = _components[component_name] ? 0
+
+  data = JSON.stringify {
+    name: incident_name,
+    message: incident_msg,
+    status: status,
+    component_id: component_id,
+    notify: true
+  }
+
+  msg
+    .http("#{url}/incidents")
+    .header('X-Cachet-Token', token)
+    .header('Content-Type', 'application/json')
+    .post(data) (err, res, body) ->
+      if err
+        msg.send err
+      else
+        json     = JSON.parse body
+        incident = json.data
+
+        msg.send "Incident \##{incident.id} declared"
 
 module.exports = (robot) ->
 
@@ -54,7 +88,7 @@ module.exports = (robot) ->
           catch e
             msg.send "Error: #{e}"
 
-  robot.respond /cachet component set ([a-zA-Z0-9]+) ([0-9]+)/i, (msg) ->
+  robot.respond /cachet component set ([a-zA-Z0-9 ]+) ([0-9]+)/i, (msg) ->
     name = msg.match[1]
     id   = parseInt(msg.match[2], 10)
 
@@ -75,14 +109,36 @@ module.exports = (robot) ->
   robot.respond /cachet component flushall/i, (msg) ->
     _components = {}
     robot.brain.data.cachet_components = _components
-    msg.send "Roger! Components have been flushed"
+    msg.reply "Roger! Components have been flushed"
 
-  robot.respond /investigating issue on ([a-zA-Z0-9]+): (.+)/i, (msg) ->
+  robot.respond /incident investigating on ([a-zA-Z0-9 ]+): (.+)/i, (msg) ->
     component_name = msg.match[1]
-    incident_name  = msg.match[2]
+    incident_msg   = msg.match[2]
+    incident_name  = "Investigating issue on #{component_name}"
 
-    msg.send [
-      "Argh! Incident on component \#",
-      _components[component_name],
-      " with name = #{incident_name}"
-    ].join '\n'
+    declare_incident component_name, incident_name, incident_msg, \
+                     IncidentStatus.Investigating,msg
+
+  robot.respond /incident identified on ([a-zA-Z0-9 ]+): (.+)/i, (msg) ->
+    component_name = msg.match[1]
+    incident_msg   = msg.match[2]
+    incident_name  = "Issue on #{component_name} has been identified"
+
+    declare_incident component_name, incident_name, incident_msg, \
+                     IncidentStatus.Identified, msg
+
+  robot.respond /incident watching on ([a-zA-Z0-9 ]+): (.+)/i, (msg) ->
+    component_name = msg.match[1]
+    incident_msg   = msg.match[2]
+    incident_name  = "Watching #{component_name}"
+
+    declare_incident component_name, incident_name, incident_msg, \
+                     IncidentStatus.Watching, msg
+
+  robot.respond /incident fixed on ([a-zA-Z0-9 ]+): (.+)/i, (msg) ->
+    component_name = msg.match[1]
+    incident_msg   = msg.match[2]
+    incident_name  = "#{component_name} is back!"
+
+    declare_incident component_name, incident_name, incident_msg, \
+                     IncidentStatus.Fixed, msg

@@ -23,4 +23,8 @@ describe 'cachet', ->
   shouldRespondTo /cachet status/i
   shouldRespondTo /cachet component list/i
   shouldRespondTo /cachet component flushall/i
-  shouldRespondTo /cachet component set ([a-zA-Z0-9]+) ([0-9]+)/i
+  shouldRespondTo /cachet component set ([a-zA-Z0-9 ]+) ([0-9]+)/i
+  shouldRespondTo /incident investigating on ([a-zA-Z0-9 ]+): (.+)/i
+  shouldRespondTo /incident identified on ([a-zA-Z0-9 ]+): (.+)/i
+  shouldRespondTo /incident watching on ([a-zA-Z0-9 ]+): (.+)/i
+  shouldRespondTo /incident fixed on ([a-zA-Z0-9 ]+): (.+)/i
