@@ -1,6 +1,9 @@
 hubot-cachet
 ============
 
+[![Build
+Status](https://travis-ci.org/willdurand/hubot-cachet.svg?branch=master)](https://travis-ci.org/willdurand/hubot-cachet)
+
 A hubot script to manage incidents/statuses with [Cachet](https://cachethq.io).
 
 See [`src/cachet.coffee`](src/cachet.coffee) for full documentation.
