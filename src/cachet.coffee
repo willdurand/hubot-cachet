@@ -27,43 +27,47 @@ token = process.env.HUBOT_CACHET_API_TOKEN ? ""
 
 _components = {}
 
-IncidentStatus =
-  Scheduled: 0,
-  Investigating: 1,
-  Identified: 2,
-  Watching: 3,
-  Fixed: 4
-
-declare_incident = (component_name, incident_name, incident_msg, status, msg) ->
-  component_id  = _components[component_name] ? 0
-  incident_name = component_name if component_id == 0
-
-  data = JSON.stringify {
-    name: incident_name,
-    message: incident_msg,
-    status: status,
-    component_id: component_id,
-    notify: true
-  }
-
-  msg
-    .http("#{url}/incidents")
-    .header('X-Cachet-Token', token)
-    .header('Content-Type', 'application/json')
-    .post(data) (err, res, body) ->
-      if err
-        msg.send err
-      else
-        json     = JSON.parse body
-        incident = json.data
-
-        msg.send "Incident \##{incident.id} declared"
-
 module.exports = (robot) ->
 
   robot.brain.on 'loaded', ->
     if robot.brain.data.cachet_components?
       _components = robot.brain.data.cachet_components
+
+  # Constants & Functions
+
+  IncidentStatus =
+    Scheduled: 0,
+    Investigating: 1,
+    Identified: 2,
+    Watching: 3,
+    Fixed: 4
+
+  declareIncident = (component_name, incident_name, incident_msg, status, msg) ->
+    component_id  = _components[component_name] ? 0
+    incident_name = component_name if component_id == 0
+
+    data = JSON.stringify {
+      name: incident_name,
+      message: incident_msg,
+      status: status,
+      component_id: component_id,
+      notify: true
+    }
+
+    msg
+      .http("#{url}/incidents")
+      .header('X-Cachet-Token', token)
+      .header('Content-Type', 'application/json')
+      .post(data) (err, res, body) ->
+        if err
+          msg.send err
+        else
+          json     = JSON.parse body
+          incident = json.data
+
+          msg.send "Incident \##{incident.id} declared"
+
+  # Listeners
 
   robot.respond /cachet status/i, (msg) ->
     results = []
@@ -103,9 +107,12 @@ module.exports = (robot) ->
       results = []
       for name of _components
         results.push "#{name} with id = #{_components[name]}"
+
+    if results.size > 0
       msg.send results.join '\n'
-    else
-      msg.send 'No component found'
+      return
+
+    msg.send 'No component found'
 
   robot.respond /cachet component flushall/i, (msg) ->
     _components = {}
@@ -117,7 +124,7 @@ module.exports = (robot) ->
     incident_msg   = msg.match[2]
     incident_name  = "Investigating issue on #{component_name}"
 
-    declare_incident component_name, incident_name, incident_msg, \
+    declareIncident component_name, incident_name, incident_msg, \
                      IncidentStatus.Investigating,msg
 
   robot.respond /incident identified on ([a-zA-Z0-9 ]+): (.+)/i, (msg) ->
@@ -125,7 +132,7 @@ module.exports = (robot) ->
     incident_msg   = msg.match[2]
     incident_name  = "Issue on #{component_name} has been identified"
 
-    declare_incident component_name, incident_name, incident_msg, \
+    declareIncident component_name, incident_name, incident_msg, \
                      IncidentStatus.Identified, msg
 
   robot.respond /incident watching on ([a-zA-Z0-9 ]+): (.+)/i, (msg) ->
@@ -133,7 +140,7 @@ module.exports = (robot) ->
     incident_msg   = msg.match[2]
     incident_name  = "Watching #{component_name}"
 
-    declare_incident component_name, incident_name, incident_msg, \
+    declareIncident component_name, incident_name, incident_msg, \
                      IncidentStatus.Watching, msg
 
   robot.respond /incident fixed on ([a-zA-Z0-9 ]+): (.+)/i, (msg) ->
@@ -141,5 +148,5 @@ module.exports = (robot) ->
     incident_msg   = msg.match[2]
     incident_name  = "#{component_name} is back!"
 
-    declare_incident component_name, incident_name, incident_msg, \
+    declareIncident component_name, incident_name, incident_msg, \
                      IncidentStatus.Fixed, msg
