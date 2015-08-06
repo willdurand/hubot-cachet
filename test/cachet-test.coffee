@@ -12,5 +12,11 @@ describe 'cachet', ->
 
     require('../src/cachet')(@robot)
 
-  it 'registers a respond listener', ->
-    expect(@robot.respond).to.have.been.calledWith(/cachet status/)
+  shouldRespondTo = (command) ->
+    it "should respond to '#{command}'", ->
+      expect(@robot.respond).to.have.been.calledWith(command)
+
+  shouldRespondTo /cachet status/i
+  shouldRespondTo /cachet component list/i
+  shouldRespondTo /cachet component flushall/i
+  shouldRespondTo /cachet component set ([a-zA-Z0-9]+) ([0-9]+)/i
