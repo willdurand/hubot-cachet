@@ -1,7 +1,7 @@
 hubot-cachet
 ============
 
-A hubot script to manage incidents/statuses with Cachet.
+A hubot script to manage incidents/statuses with [Cachet](https://cachethq.io).
 
 See [`src/cachet.coffee`](src/cachet.coffee) for full documentation.
 
@@ -23,9 +23,23 @@ Then add **hubot-cachet** to your `external-scripts.json`:
 Usage
 -----
 
+Most of the commands are available under the `cachet` namespace:
+
 ```
 hubot help cachet
 ```
+
+For simplicity purpose, incidents are managed with this namespace:
+
+```
+hubot help incident
+```
+
+### Screenshots
+
+![](doc/slack.png)
+
+![](doc/cachet.png)
 
 License
 -------
