@@ -4,35 +4,35 @@
   "version": "0.1.0",
   "author": "William Durand <will+git@drnd.me>",
   "license": "MIT",
-
-  "keywords": ["hubot","hubot-scripts","cachet","incident","status","cachethq"],
-
+  "keywords": [
+    "hubot",
+    "hubot-scripts",
+    "cachet",
+    "incident",
+    "status",
+    "cachethq"
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/willdurand/hubot-cachet.git"
   },
-
   "bugs": {
     "url": "https://github.com/willdurand/hubot-cachet/issues"
   },
-
   "dependencies": {
     "coffee-script": "~1.6"
   },
-
   "devDependencies": {
-    "mocha": "*",
-    "chai": "*",
-    "sinon-chai": "*",
-    "sinon": "*",
+    "chai": "^3.2.0",
+    "grunt-contrib-watch": "~0.5.3",
     "grunt-mocha-test": "~0.7.0",
     "grunt-release": "~0.6.0",
+    "hubot-mock-adapter": "^1.0.0",
     "matchdep": "~0.1.2",
-    "grunt-contrib-watch": "~0.5.3"
+    "mocha": "^2.2.5",
+    "nock": "^2.10.0"
   },
-
   "main": "index.coffee",
-
   "scripts": {
     "test": "script/test"
   }
