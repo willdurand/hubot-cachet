@@ -104,3 +104,21 @@ describe 'cachet', ->
       helper.converse @robot, @user, '/incident fixed on foo: msg', (envelope, response) ->
         assert.include response, 'Incident `#126` declared'
         done()
+
+    it 'should allow to create incidents on known components', (done) ->
+      helper.converse @robot, @user, '/cachet component set foo 3', (envelope, response) ->
+        assert.include response, 'The component \'foo\' (id = 3) has been set'
+
+      json = {
+        name:"foo is back!",
+        message:"msg",
+        status:4,
+        component_id:3,
+        notify:true
+      }
+
+      api.post('/incidents', json).reply(201, { data: { id: 127 } })
+
+      helper.converse @robot, @user, '/incident fixed on foo: msg', (envelope, response) ->
+        assert.include response, 'Incident `#127` declared'
+        done()
