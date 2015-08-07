@@ -6,7 +6,7 @@ nock   = require 'nock'
 process.env.HUBOT_CACHET_API_URL = 'http://cachet.example.org'
 api = nock(process.env.HUBOT_CACHET_API_URL).filteringPath(/\/\//, '/')
 
-describe 'cachet', ->
+describe 'hubot cachet', ->
   beforeEach (done) ->
     @robot = helper.robot()
     @user  = helper.testUser @robot
@@ -22,12 +22,13 @@ describe 'cachet', ->
   it 'should be included in /help', ->
     assert.include @robot.commands[0], 'cachet'
 
-  describe 'component commands', ->
-    it 'should report when there are no components registered', (done) ->
+  describe 'component list', ->
+    it 'should say when there are no components registered', (done) ->
       helper.converse @robot, @user, '/cachet component list', (envelope, response) ->
         assert.include response, 'No component found'
         done()
 
+  describe 'component set <component name> <id>', ->
     it 'should register components', (done) ->
       helper.converse @robot, @user, '/cachet component set foo 1', (envelope, response) ->
         assert.include response, 'The component \'foo\' (id = 1) has been set'
@@ -36,6 +37,7 @@ describe 'cachet', ->
         assert.include response, 'foo with id = 1'
         done()
 
+  describe 'component flushall', ->
     it 'should flush all components', (done) ->
       helper.converse @robot, @user, '/cachet component flushall', (envelope, response) ->
         assert.include response, 'Roger!'
@@ -44,7 +46,37 @@ describe 'cachet', ->
         assert.include response, 'No component found'
         done()
 
-  describe 'incident commands', ->
+  describe 'component status', ->
+    it 'should show component statuses', (done) ->
+      components = [
+        { name: 'bar', status_name: 'Operational', updated_at: 'date' },
+        { name: 'baz', status_name: 'Major outage', updated_at: 'date' },
+      ]
+
+      api.get('/components').reply(200, { data: components })
+
+      helper.converse @robot, @user, '/cachet component status', (envelope, response) ->
+        assert.equal response, [
+          'bar: Operational (last updated at: date)',
+          'baz: Major outage (last updated at: date)'
+        ].join '\n'
+        done()
+
+    it 'should say when there are no component statuses available', (done) ->
+      api.get('/components').reply(200, { data: [] })
+
+      helper.converse @robot, @user, '/cachet component status', (envelope, response) ->
+        assert.equal response, 'No component found'
+        done()
+
+    it 'should deal with API errors', (done) ->
+      api.get('/components').reply(500, {})
+
+      helper.converse @robot, @user, '/cachet component status', (envelope, response) ->
+        assert.equal response, 'The request to the API has failed (status code = 500)'
+        done()
+
+  describe 'incident investigating on <component name>: <incident message>', ->
     it 'should allow to declare "investigating" incidents', (done) ->
       json = {
         name:"foo",
@@ -60,6 +92,7 @@ describe 'cachet', ->
         assert.include response, 'Incident `#123` declared'
         done()
 
+  describe 'incident identified on <component name>: <incident message>', ->
     it 'should allow to declare "identified" incidents', (done) ->
       json = {
         name:"foo",
@@ -75,6 +108,7 @@ describe 'cachet', ->
         assert.include response, 'Incident `#124` declared'
         done()
 
+  describe 'incident watching on <component name>: <incident message>', ->
     it 'should allow to declare "watching" incidents', (done) ->
       json = {
         name:"foo",
@@ -90,6 +124,7 @@ describe 'cachet', ->
         assert.include response, 'Incident `#125` declared'
         done()
 
+  describe 'incident fixed on <component name>: <incident message>', ->
     it 'should allow to declare "fixed" incidents', (done) ->
       json = {
         name:"foo",
@@ -105,6 +140,7 @@ describe 'cachet', ->
         assert.include response, 'Incident `#126` declared'
         done()
 
+  describe 'incident commands', ->
     it 'should allow to declare incidents on known components', (done) ->
       helper.converse @robot, @user, '/cachet component set foo 3', (envelope, response) ->
         assert.include response, 'The component \'foo\' (id = 3) has been set'
@@ -121,4 +157,22 @@ describe 'cachet', ->
 
       helper.converse @robot, @user, '/incident fixed on foo: msg', (envelope, response) ->
         assert.include response, 'Incident `#127` declared'
+        done()
+
+    it 'should deal with API errors', (done) ->
+      helper.converse @robot, @user, '/cachet component set foo 3', (envelope, response) ->
+        assert.include response, 'The component \'foo\' (id = 3) has been set'
+
+      json = {
+        name:"foo is back!",
+        message:"msg",
+        status:4,
+        component_id:3,
+        notify:true
+      }
+
+      api.post('/incidents', json).reply(400, {})
+
+      helper.converse @robot, @user, '/incident fixed on foo: msg', (envelope, response) ->
+        assert.include response, 'The request to the API has failed (status code = 400)'
         done()
