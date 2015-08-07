@@ -1,3 +1,4 @@
+# Based on: https://gist.github.com/technicalpickles/971b40520fb8db63a6f4
 Path  = require 'path'
 hubot = require 'hubot'
 
