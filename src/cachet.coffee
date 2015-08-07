@@ -6,7 +6,7 @@
 #   HUBOT_CACHET_API_TOKEN
 #
 #  Commands:
-#   hubot cachet status <red|orange|blue|green> <component name> - Change the  component status
+#   hubot cachet status <red|orange|blue|green> <component name> - Change the component status
 #   hubot cachet component status - Print all components along with their statuses
 #   hubot cachet component set <component name> <id> - Register a component into my brain
 #   hubot cachet component list - List all registered components into my brain (i.e. Cachet could own more components)
@@ -68,7 +68,7 @@ module.exports = (robot) ->
       .header('Content-Type', 'application/json')
       .post(data) (err, res, body) ->
         if err
-          msg.reply err
+          msg.reply "[ERROR] #{err}"
         else
           try
             json     = JSON.parse body
@@ -79,7 +79,7 @@ module.exports = (robot) ->
               'You might want to change the component status now.'
             ].join ' '
           catch e
-            msg.reply "Error: #{e}"
+            msg.reply "[ERROR] #{e}"
 
   changeComponentStatus = (component_name, status, msg) ->
     component_id = _components[component_name] ? 0
@@ -105,7 +105,7 @@ module.exports = (robot) ->
       .header('Content-Type', 'application/json')
       .put(data) (err, res, body) ->
         if err
-          msg.reply err
+          msg.reply "[ERROR] #{err}"
         else
           try
             json     = JSON.parse body
@@ -113,7 +113,7 @@ module.exports = (robot) ->
 
             msg.send "#{component.name} status changed to: *#{component.status_name}*"
           catch e
-            msg.reply "Error: #{e}"
+            msg.reply "[ERROR] #{e}"
 
   # Listeners
 
@@ -134,7 +134,7 @@ module.exports = (robot) ->
       .headers('X-Cachet-Token': token)
       .get() (err, res, body) ->
         if err
-          msg.reply err
+          msg.reply "[ERROR] #{err}"
         else
           try
             json = JSON.parse body
@@ -149,7 +149,7 @@ module.exports = (robot) ->
             else
               msg.send results.join '\n'
           catch e
-            msg.reply "Error: #{e}"
+            msg.reply "[ERROR] #{e}"
 
   robot.respond /cachet component set ([a-zA-Z0-9 ]+) ([0-9]+)/i, (msg) ->
     name = msg.match[1]
