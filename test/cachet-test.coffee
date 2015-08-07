@@ -45,7 +45,7 @@ describe 'cachet', ->
         done()
 
   describe 'incident commands', ->
-    it 'should allow to create "investigating" incidents', (done) ->
+    it 'should allow to declare "investigating" incidents', (done) ->
       json = {
         name:"foo",
         message:"msg",
@@ -60,7 +60,7 @@ describe 'cachet', ->
         assert.include response, 'Incident `#123` declared'
         done()
 
-    it 'should allow to create "identified" incidents', (done) ->
+    it 'should allow to declare "identified" incidents', (done) ->
       json = {
         name:"foo",
         message:"msg",
@@ -75,7 +75,7 @@ describe 'cachet', ->
         assert.include response, 'Incident `#124` declared'
         done()
 
-    it 'should allow to create "watching" incidents', (done) ->
+    it 'should allow to declare "watching" incidents', (done) ->
       json = {
         name:"foo",
         message:"msg",
@@ -90,7 +90,7 @@ describe 'cachet', ->
         assert.include response, 'Incident `#125` declared'
         done()
 
-    it 'should allow to create "fixed" incidents', (done) ->
+    it 'should allow to declare "fixed" incidents', (done) ->
       json = {
         name:"foo",
         message:"msg",
@@ -105,7 +105,7 @@ describe 'cachet', ->
         assert.include response, 'Incident `#126` declared'
         done()
 
-    it 'should allow to create incidents on known components', (done) ->
+    it 'should allow to declare incidents on known components', (done) ->
       helper.converse @robot, @user, '/cachet component set foo 3', (envelope, response) ->
         assert.include response, 'The component \'foo\' (id = 3) has been set'
 
