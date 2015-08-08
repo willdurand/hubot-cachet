@@ -1,7 +1,7 @@
 {
   "name": "hubot-cachethq",
   "description": "A hubot script to manage incidents/statuses with Cachet",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "author": "William Durand <will+git@drnd.me>",
   "license": "MIT",
   "keywords": [
