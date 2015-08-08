@@ -22,8 +22,8 @@
 #   hubot cachet maintenance at <scheduled_at> <name>: <message> - Schedule a maintenance (e.g. `cachet maintenance at 2015-08-15 10:00:00 Database upgrade: Message`)
 #
 # Notes:
-#   Components MUST be registered with `cachet component set` before being able
-#   to use them (e.g. `<component name>`).
+#   Components MUST be registered with `cachet component set` before you are
+#   able to use them (e.g. `<component name>`).
 #
 # Author:
 #   William Durand
