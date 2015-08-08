@@ -284,3 +284,59 @@ describe 'hubot cachet', ->
       helper.converse @robot, @user, '/incident 789 update message: new message', (envelope, response) ->
         assert.equal response, 'Incident `#789` does not exist.'
         done()
+
+  describe 'incident <id> enable', ->
+    it 'should enable an existing incident', (done) ->
+      json = { visible: 1 }
+
+      api.put('/incidents/456', json).reply(200, { data: { id: 456 } })
+
+      helper.converse @robot, @user, '/incident 456 enable', (envelope, response) ->
+        assert.include response, 'Incident `#456` updated.'
+        done()
+
+    it 'should allow #123 as well as 123', (done) ->
+      json = { visible: 1 }
+
+      api.put('/incidents/456', json).reply(200, { data: { id: 456 } })
+
+      helper.converse @robot, @user, '/incident #456 enable', (envelope, response) ->
+        assert.include response, 'Incident `#456` updated.'
+        done()
+
+    it 'should handle non-existing incidents', (done) ->
+      json = { visible: 1 }
+
+      api.put('/incidents/789', json).reply(404)
+
+      helper.converse @robot, @user, '/incident 789 enable', (envelope, response) ->
+        assert.equal response, 'Incident `#789` does not exist.'
+        done()
+
+  describe 'incident <id> disable', ->
+    it 'should disable an existing incident', (done) ->
+      json = { visible: 0 }
+
+      api.put('/incidents/456', json).reply(200, { data: { id: 456 } })
+
+      helper.converse @robot, @user, '/incident 456 disable', (envelope, response) ->
+        assert.include response, 'Incident `#456` updated.'
+        done()
+
+    it 'should allow #123 as well as 123', (done) ->
+      json = { visible: 0 }
+
+      api.put('/incidents/456', json).reply(200, { data: { id: 456 } })
+
+      helper.converse @robot, @user, '/incident #456 disable', (envelope, response) ->
+        assert.include response, 'Incident `#456` updated.'
+        done()
+
+    it 'should handle non-existing incidents', (done) ->
+      json = { visible: 0 }
+
+      api.put('/incidents/789', json).reply(404)
+
+      helper.converse @robot, @user, '/incident 789 disable', (envelope, response) ->
+        assert.equal response, 'Incident `#789` does not exist.'
+        done()

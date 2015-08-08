@@ -17,6 +17,8 @@
 #   hubot incident fixed on <component name>: <incident message> - Declare an incident when things are fixed
 #   hubot incident <id> update name: <new name> - Update the name of an existing incident
 #   hubot incident <id> update message: <new name> - Update the message (content) of an existing incident
+#   hubot incident <id> enable - Make an existing incident visible in Cachet
+#   hubot incident <id> disable - Hide an existing incident in Cachet
 #   hubot cachet maintenance at <scheduled_at> <name>: <message> - Schedule a maintenance (e.g. `cachet maintenance at 2015-08-15 10:00:00 Database upgrade: Message`)
 #
 # Notes:
@@ -267,3 +269,13 @@ module.exports = (robot) ->
     incident_msg = msg.match[2]
 
     updateIncident incident_id, { message: incident_msg }, msg
+
+  robot.respond /incident #?([0-9]+) enable/i, (msg) ->
+    incident_id = msg.match[1]
+
+    updateIncident incident_id, { visible: 1 }, msg
+
+  robot.respond /incident #?([0-9]+) disable/i, (msg) ->
+    incident_id = msg.match[1]
+
+    updateIncident incident_id, { visible: 0 }, msg
