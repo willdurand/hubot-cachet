@@ -200,3 +200,20 @@ describe 'hubot cachet', ->
       helper.converse @robot, @user, '/cachet status blue foo', (envelope, response) ->
         assert.equal response, 'The request to the API has failed (status code = 409)'
         done()
+
+  describe 'cachet maintenance at <scheduled_at> <name>: <message>', ->
+    it 'should create a new maintenance', (done) ->
+      json = {
+        name:"Foo is upgraded",
+        message:"This is a maintenance message",
+        status:0,
+        component_id:0,
+        notify:true,
+        scheduled_at: '2015-08-15 10:00:00'
+      }
+
+      api.post('/incidents', json).reply(201, { data: { id: 456 } })
+
+      helper.converse @robot, @user, '/cachet maintenance at 2015-08-15 10:00:00 Foo is upgraded: This is a maintenance message', (envelope, response) ->
+        assert.include response, 'Incident `#456` declared.'
+        done()

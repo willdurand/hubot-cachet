@@ -15,6 +15,7 @@
 #   hubot incident identified on <component name>: <incident message> - Declare an incident when you find the (root) cause of the current issue
 #   hubot incident watching on <component name>: <incident message> - Declare an incident when you monitor changes due to an outage for instance
 #   hubot incident fixed on <component name>: <incident message> - Declare an incident when things are fixed
+#   hubot cachet maintenance at <scheduled_at> <name>: <message> - Schedule a maintenance (e.g. `cachet maintenance at 2015-08-15 10:00:00 Database upgrade: Message`)
 #
 # Notes:
 #   Components MUST be registered with `cachet component set` before being able
@@ -72,17 +73,22 @@ module.exports = (robot) ->
   ###
   Call the API to declare a new incident
   ###
-  declareIncident = (component_name, incident_name, incident_msg, status, msg) ->
+  declareIncident = (component_name, incident_name, incident_msg, status, msg, scheduled_at) ->
     component_id  = _components[component_name] ? 0
-    incident_name = component_name if component_id == 0
+    incident_name = component_name if component_id == 0 unless not component_name?
 
-    data = JSON.stringify {
+    data = {
       name: incident_name,
       message: incident_msg,
       status: status,
       component_id: component_id,
       notify: true
     }
+
+    if scheduled_at?
+      data.scheduled_at = scheduled_at
+
+    data = JSON.stringify data
 
     apiRequest msg, 'POST', '/incidents', data, (body) ->
       json     = JSON.parse body
@@ -205,3 +211,11 @@ module.exports = (robot) ->
 
     declareIncident component_name, incident_name, incident_msg, \
                      IncidentStatus.Fixed, msg
+
+  robot.respond /cachet maintenance at (\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) (.+): (.+)/i, (msg) ->
+    scheduled_at  = msg.match[1]
+    incident_name = msg.match[2]
+    incident_msg  = msg.match[3]
+
+    declareIncident null, incident_name, incident_msg, \
+                     IncidentStatus.Scheduled, msg, scheduled_at
