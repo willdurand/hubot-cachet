@@ -217,3 +217,31 @@ describe 'hubot cachet', ->
       helper.converse @robot, @user, '/cachet maintenance at 2015-08-15 10:00:00 Foo is upgraded: This is a maintenance message', (envelope, response) ->
         assert.include response, 'Incident `#456` declared.'
         done()
+
+  describe 'incident <id> update name: <name>', ->
+    it 'should update an existing incident', (done) ->
+      json = { name: "new name" }
+
+      api.put('/incidents/456', json).reply(200, { data: { id: 456 } })
+
+      helper.converse @robot, @user, '/incident 456 update name: new name', (envelope, response) ->
+        assert.include response, 'Incident `#456` updated.'
+        done()
+
+    it 'should allow #123 as well as 123', (done) ->
+      json = { name: "new name" }
+
+      api.put('/incidents/456', json).reply(200, { data: { id: 456 } })
+
+      helper.converse @robot, @user, '/incident #456 update name: new name', (envelope, response) ->
+        assert.include response, 'Incident `#456` updated.'
+        done()
+
+    it 'should handle non-existing incidents', (done) ->
+      json = { name: "new name" }
+
+      api.put('/incidents/789', json).reply(404)
+
+      helper.converse @robot, @user, '/incident 789 update name: new name', (envelope, response) ->
+        assert.equal response, 'Incident `#789` does not exist.'
+        done()

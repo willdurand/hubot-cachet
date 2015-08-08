@@ -15,6 +15,7 @@
 #   hubot incident identified on <component name>: <incident message> - Declare an incident when you find the (root) cause of the current issue
 #   hubot incident watching on <component name>: <incident message> - Declare an incident when you monitor changes due to an outage for instance
 #   hubot incident fixed on <component name>: <incident message> - Declare an incident when things are fixed
+#   hubot incident <id> update name: <new name> - Update the name of an existing incident
 #   hubot cachet maintenance at <scheduled_at> <name>: <message> - Schedule a maintenance (e.g. `cachet maintenance at 2015-08-15 10:00:00 Database upgrade: Message`)
 #
 # Notes:
@@ -52,7 +53,13 @@ module.exports = (robot) ->
   ###
   Perform an API request with default headers and error handling
   ###
-  apiRequest = (msg, method, endpoint, data, success) ->
+  apiRequest = (msg, method, endpoint, data, success, notFound) ->
+    failed = (res, msg) ->
+      msg.reply [
+        'The request to the API has failed',
+        "(status code = #{res.statusCode})"
+      ].join ' '
+
     msg
       .http([ url, endpoint ].join '')
       .header('X-Cachet-Token', token)
@@ -67,8 +74,13 @@ module.exports = (robot) ->
                 success body
               catch e
                 msg.reply "[ERROR] #{e}"
+            when 404
+              if notFound?
+                notFound body
+              else
+                failed res, msg
             else
-              msg.reply "The request to the API has failed (status code = #{res.statusCode})"
+              failed res, msg
 
   ###
   Call the API to declare a new incident
@@ -98,6 +110,20 @@ module.exports = (robot) ->
         "Incident `\##{incident.id}` declared.",
         'You might want to change the component status now.'
       ].join ' '
+
+  ###
+  Call the API to update an existing incident
+  ###
+  updateIncident = (incident_id, data, msg) ->
+    data = JSON.stringify data
+
+    apiRequest msg, 'PUT', "/incidents/#{incident_id}", data, (body) ->
+      json     = JSON.parse body
+      incident = json.data
+
+      msg.send "Incident `\##{incident.id}` updated.",
+    , (body) ->
+      msg.reply "Incident `\##{incident_id}` does not exist."
 
   ###
   Call the API to change a component's status
@@ -219,3 +245,9 @@ module.exports = (robot) ->
 
     declareIncident null, incident_name, incident_msg, \
                      IncidentStatus.Scheduled, msg, scheduled_at
+
+  robot.respond /incident #?([0-9]+) update name: (.+)/i, (msg) ->
+    incident_id   = msg.match[1]
+    incident_name = msg.match[2]
+
+    updateIncident incident_id, { name: incident_name }, msg
