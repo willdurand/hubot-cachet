@@ -16,6 +16,7 @@
 #   hubot incident watching on <component name>: <incident message> - Declare an incident when you monitor changes due to an outage for instance
 #   hubot incident fixed on <component name>: <incident message> - Declare an incident when things are fixed
 #   hubot incident <id> update name: <new name> - Update the name of an existing incident
+#   hubot incident <id> update message: <new name> - Update the message (content) of an existing incident
 #   hubot cachet maintenance at <scheduled_at> <name>: <message> - Schedule a maintenance (e.g. `cachet maintenance at 2015-08-15 10:00:00 Database upgrade: Message`)
 #
 # Notes:
@@ -251,3 +252,9 @@ module.exports = (robot) ->
     incident_name = msg.match[2]
 
     updateIncident incident_id, { name: incident_name }, msg
+
+  robot.respond /incident #?([0-9]+) update message: (.+)/i, (msg) ->
+    incident_id  = msg.match[1]
+    incident_msg = msg.match[2]
+
+    updateIncident incident_id, { message: incident_msg }, msg

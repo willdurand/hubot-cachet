@@ -245,3 +245,31 @@ describe 'hubot cachet', ->
       helper.converse @robot, @user, '/incident 789 update name: new name', (envelope, response) ->
         assert.equal response, 'Incident `#789` does not exist.'
         done()
+
+  describe 'incident <id> update message: <message>', ->
+    it 'should update an existing incident', (done) ->
+      json = { message: "new message" }
+
+      api.put('/incidents/456', json).reply(200, { data: { id: 456 } })
+
+      helper.converse @robot, @user, '/incident 456 update message: new message', (envelope, response) ->
+        assert.include response, 'Incident `#456` updated.'
+        done()
+
+    it 'should allow #123 as well as 123', (done) ->
+      json = { message: "new message" }
+
+      api.put('/incidents/456', json).reply(200, { data: { id: 456 } })
+
+      helper.converse @robot, @user, '/incident #456 update message: new message', (envelope, response) ->
+        assert.include response, 'Incident `#456` updated.'
+        done()
+
+    it 'should handle non-existing incidents', (done) ->
+      json = { message: "new message" }
+
+      api.put('/incidents/789', json).reply(404)
+
+      helper.converse @robot, @user, '/incident 789 update message: new message', (envelope, response) ->
+        assert.equal response, 'Incident `#789` does not exist.'
+        done()
