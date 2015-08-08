@@ -23,9 +23,9 @@
 # Author:
 #   William Durand
 
-URL   = require "url"
-url   = URL.format(URL.parse(process.env.HUBOT_CACHET_API_URL ? ""))
-token = process.env.HUBOT_CACHET_API_TOKEN ? ""
+URL   = require 'url'
+url   = URL.format(URL.parse(process.env.HUBOT_CACHET_API_URL ? ''))
+token = process.env.HUBOT_CACHET_API_TOKEN ? ''
 
 _components = {}
 
@@ -34,8 +34,6 @@ module.exports = (robot) ->
   robot.brain.on 'loaded', ->
     if robot.brain.data.cachet_components?
       _components = robot.brain.data.cachet_components
-
-  # Constants & Functions
 
   IncidentStatus =
     Scheduled: 0,
@@ -50,6 +48,9 @@ module.exports = (robot) ->
     PartialOutage: 3,
     MajorOutage: 4
 
+  ###
+  Perform an API request with default headers and error handling
+  ###
   apiRequest = (msg, method, endpoint, data, success) ->
     msg
       .http([ url, endpoint ].join '')
@@ -68,6 +69,9 @@ module.exports = (robot) ->
             else
               msg.reply "The request to the API has failed (status code = #{res.statusCode})"
 
+  ###
+  Call the API to declare a new incident
+  ###
   declareIncident = (component_name, incident_name, incident_msg, status, msg) ->
     component_id  = _components[component_name] ? 0
     incident_name = component_name if component_id == 0
@@ -89,6 +93,9 @@ module.exports = (robot) ->
         'You might want to change the component status now.'
       ].join ' '
 
+  ###
+  Call the API to change a component's status
+  ###
   changeComponentStatus = (component_name, status, msg) ->
     component_id = _components[component_name] ? 0
 
@@ -113,7 +120,9 @@ module.exports = (robot) ->
 
       msg.send "#{component.name} status changed to: *#{component.status_name}*"
 
-  # Listeners
+  ###
+  Listeners
+  ###
 
   robot.respond /cachet status (red|orange|blue|green) ([a-zA-Z0-9 ]+)/i, (msg) ->
     component_name = msg.match[2]
