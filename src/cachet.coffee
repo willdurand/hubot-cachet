@@ -26,7 +26,9 @@
 # Author:
 #   William Durand
 
-URL   = require 'url'
+URL    = require 'url'
+moment = require 'moment'
+
 url   = URL.format(URL.parse(process.env.HUBOT_CACHET_API_URL ? ''))
 token = process.env.HUBOT_CACHET_API_TOKEN ? ''
 
@@ -173,9 +175,16 @@ module.exports = (robot) ->
 
       results = []
       for component in json.data
+        updated_at = moment(new Date(component.updated_at))
+
+        if updated_at.isValid()
+          updated_at = updated_at.fromNow()
+        else
+          updated_at = component.updated_at
+
         results.push [
           "#{component.name}: #{component.status_name}",
-          "(last updated at: #{component.updated_at})"
+          "(last updated: #{updated_at})"
         ].join ' '
 
       if results?.length < 1

@@ -20,7 +20,8 @@
     "url": "https://github.com/willdurand/hubot-cachet/issues"
   },
   "dependencies": {
-    "coffee-script": "~1.6"
+    "coffee-script": "~1.6",
+    "moment": "^2.10.6"
   },
   "devDependencies": {
     "chai": "^3.2.0",

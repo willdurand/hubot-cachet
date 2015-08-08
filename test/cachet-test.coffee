@@ -57,9 +57,20 @@ describe 'hubot cachet', ->
 
       helper.converse @robot, @user, '/cachet component status', (envelope, response) ->
         assert.equal response, [
-          'bar: Operational (last updated at: date)',
-          'baz: Major outage (last updated at: date)'
+          'bar: Operational (last updated: date)',
+          'baz: Major outage (last updated: date)'
         ].join '\n'
+        done()
+
+    it 'should pretty format dates', (done) ->
+      components = [
+        { name: 'bar', status_name: 'Operational', updated_at: '2015-08-06 15:16:48' },
+      ]
+
+      api.get('/components').reply(200, { data: components })
+
+      helper.converse @robot, @user, '/cachet component status', (envelope, response) ->
+        assert.match response, /^bar: Operational \(last updated: (.+)\)$/
         done()
 
     it 'should say when there are no component statuses available', (done) ->
