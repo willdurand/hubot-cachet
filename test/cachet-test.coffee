@@ -340,3 +340,60 @@ describe 'hubot cachet', ->
       helper.converse @robot, @user, '/incident 789 disable', (envelope, response) ->
         assert.equal response, 'Incident `#789` does not exist.'
         done()
+
+  describe 'incident last <nb incidents>', ->
+    it 'should list the last 2 incidents', (done) ->
+      incidents = [
+        { name: 'API is back!', human_status: 'Fixed' },
+        { name: 'Issue on API has been identified', human_status: 'Identified' },
+      ]
+
+      api
+        .get('/incidents?sort=created_at&order=desc&per_page=2')
+        .reply(200, { data: incidents })
+
+      helper.converse @robot, @user, '/incident last 2', (envelope, response) ->
+        assert.equal response, [
+          'API is back! (status = Fixed)',
+          'Issue on API has been identified (status = Identified)'
+        ].join '\n'
+        done()
+
+    it 'should list the last 5 incidents by default', (done) ->
+      incidents = [
+        { name: 'API is back 1!', human_status: 'Fixed' },
+        { name: 'API is back 2!', human_status: 'Fixed' },
+        { name: 'API is back 3!', human_status: 'Fixed' },
+        { name: 'API is back 4!', human_status: 'Fixed' },
+        { name: 'API is back 5!', human_status: 'Fixed' },
+      ]
+
+      api
+        .get('/incidents?sort=created_at&order=desc&per_page=5')
+        .reply(200, { data: incidents })
+
+      helper.converse @robot, @user, '/incident last', (envelope, response) ->
+        assert.equal response, [
+          'API is back 1! (status = Fixed)',
+          'API is back 2! (status = Fixed)',
+          'API is back 3! (status = Fixed)',
+          'API is back 4! (status = Fixed)',
+          'API is back 5! (status = Fixed)',
+        ].join '\n'
+        done()
+
+    it 'should say when there are no incidents', (done) ->
+      api
+        .get('/incidents?sort=created_at&order=desc&per_page=5')
+        .reply(200, { data: [] })
+
+      helper.converse @robot, @user, '/incident last 5', (envelope, response) ->
+        assert.equal response, 'No incident found'
+        done()
+
+    it 'should deal with API errors', (done) ->
+      api.get('/incidents?sort=created_at&order=desc&per_page=5').reply(500)
+
+      helper.converse @robot, @user, '/incident last', (envelope, response) ->
+        assert.equal response, 'The request to the API has failed (status code = 500)'
+        done()

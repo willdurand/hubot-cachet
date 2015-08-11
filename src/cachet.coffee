@@ -20,6 +20,7 @@
 #   hubot incident <id> update message: <new name> - Update the message (content) of an existing incident
 #   hubot incident <id> enable - Make an existing incident visible in Cachet
 #   hubot incident <id> disable - Hide an existing incident in Cachet
+#   hubot incident last <nb incidents> - Print recent incidents
 #
 # Notes:
 #   Components MUST be registered with `cachet component set` before you are
@@ -279,3 +280,25 @@ module.exports = (robot) ->
     incident_id = msg.match[1]
 
     updateIncident incident_id, { visible: 0 }, msg
+
+  robot.respond /incident last(\s+[0-9]+)?/i, (msg) ->
+    if msg.match[1]?
+      nb = parseInt(msg.match[1], 10)
+
+    if not nb?
+      nb = 5
+
+    apiRequest msg, 'GET', "/incidents?sort=created_at&order=desc&per_page=#{nb}",
+      {}, (body) ->
+        json      = JSON.parse body
+        incidents = json.data
+
+        results = []
+        for incident in incidents
+          results.push "#{incident.name} (status = #{incident.human_status})"
+
+        if results?.length < 1
+          msg.send 'No incident found'
+          return
+
+        msg.send results.join '\n'
