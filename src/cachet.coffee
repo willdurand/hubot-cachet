@@ -7,6 +7,7 @@
 #
 #  Commands:
 #   hubot cachet status <red|orange|blue|green> <component name> - Change the component status
+#   hubot cachet maintenance at <scheduled_at> <name>: <message> - Schedule a maintenance (e.g. `cachet maintenance at 2015-08-15 10:00:00 Database upgrade: Message`)
 #   hubot cachet component status - Print all components along with their statuses
 #   hubot cachet component set <component name> <id> - Register a component into my brain
 #   hubot cachet component list - List all registered components into my brain (i.e. Cachet could own more components)
@@ -19,7 +20,6 @@
 #   hubot incident <id> update message: <new name> - Update the message (content) of an existing incident
 #   hubot incident <id> enable - Make an existing incident visible in Cachet
 #   hubot incident <id> disable - Hide an existing incident in Cachet
-#   hubot cachet maintenance at <scheduled_at> <name>: <message> - Schedule a maintenance (e.g. `cachet maintenance at 2015-08-15 10:00:00 Database upgrade: Message`)
 #
 # Notes:
 #   Components MUST be registered with `cachet component set` before you are
