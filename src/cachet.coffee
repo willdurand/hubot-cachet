@@ -12,7 +12,7 @@
 #   hubot cachet component set <component name> <id> - Register a component into my brain
 #   hubot cachet component list - List all registered components into my brain (i.e. Cachet could own more components)
 #   hubot cachet component flushall - Remove all registered components from my brain
-#   hubot incident investigating on <component name>: <incident message> - Declare an incident on a component (or anything else if it cannot be linked to an existing compoenent) when it experiences an issue
+#   hubot incident investigating on <component name>: <incident message> - Declare an incident on a component (or anything else if it cannot be linked to an existing component) when it experiences an issue
 #   hubot incident identified on <component name>: <incident message> - Declare an incident when you find the (root) cause of the current issue
 #   hubot incident watching on <component name>: <incident message> - Declare an incident when you monitor changes due to an outage for instance
 #   hubot incident fixed on <component name>: <incident message> - Declare an incident when things are fixed
