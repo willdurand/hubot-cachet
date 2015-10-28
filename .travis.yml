@@ -11,7 +11,7 @@ env:
   - HUBOT_VERSION=2.14
   - HUBOT_VERSION=latest
 
-before_script:
+before_install:
   - if [[ "$HUBOT_VERSION" != "latest" ]]; then npm install "hubot@$HUBOT_VERSION" --save-dev; fi;
 
 cache:
