@@ -1,9 +1,19 @@
 language: node_js
+sudo: false
+
 node_js:
   - "0.10"
   - "0.12"
   - "4"
-sudo: false
+
+env:
+  - HUBOT_VERSION=2.13.2
+  - HUBOT_VERSION=2.14
+  - HUBOT_VERSION=latest
+
+before_script:
+  - if [[ "$HUBOT_VERSION" != "latest" ]]; then npm install "hubot@$HUBOT_VERSION" --save-dev; fi;
+
 cache:
   directories:
     - node_modules
