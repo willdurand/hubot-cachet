@@ -19,8 +19,9 @@ describe 'hubot cachet', ->
   afterEach ->
     @robot.shutdown()
 
-  it 'should be included in /help', ->
+  it 'should be included in /help', (done) ->
     assert.include @robot.commands[0], 'cachet'
+    done()
 
   describe 'cachet component list', ->
     it 'should say when there are no components registered', (done) ->
@@ -32,7 +33,9 @@ describe 'hubot cachet', ->
     it 'should register components', (done) ->
       helper.converse @robot, @user, '/cachet component set foo 1', (envelope, response) ->
         assert.include response, 'The component \'foo\' (id = 1) has been set'
+        done()
 
+    it 'should list the component', (done) ->
       helper.converse @robot, @user, '/cachet component list', (envelope, response) ->
         assert.include response, 'foo with id = 1'
         done()
@@ -41,7 +44,9 @@ describe 'hubot cachet', ->
     it 'should flush all components', (done) ->
       helper.converse @robot, @user, '/cachet component flushall', (envelope, response) ->
         assert.include response, 'Roger!'
+        done()
 
+    it 'should return an empty list with a nice message', (done) ->
       helper.converse @robot, @user, '/cachet component list', (envelope, response) ->
         assert.include response, 'No component found'
         done()
@@ -152,10 +157,12 @@ describe 'hubot cachet', ->
         done()
 
   describe 'incident commands', ->
-    it 'should allow to declare incidents on known components', (done) ->
+    it 'should have one component set before', (done) ->
       helper.converse @robot, @user, '/cachet component set foo 3', (envelope, response) ->
         assert.include response, 'The component \'foo\' (id = 3) has been set'
+        done()
 
+    it 'should allow to declare incidents on known components', (done) ->
       json = {
         name:"foo is back!",
         message:"msg",
@@ -170,10 +177,13 @@ describe 'hubot cachet', ->
         assert.include response, 'Incident `#127` declared'
         done()
 
-    it 'should deal with API errors', (done) ->
+  describe 'incident commands (errors)', ->
+    it 'should jave one component set before', (done) ->
       helper.converse @robot, @user, '/cachet component set foo 3', (envelope, response) ->
         assert.include response, 'The component \'foo\' (id = 3) has been set'
+        done()
 
+    it 'should deal with API errors', (done) ->
       json = {
         name:"foo is back!",
         message:"msg",
@@ -189,10 +199,12 @@ describe 'hubot cachet', ->
         done()
 
   describe 'cachet status <red|orange|blue|green> <component name>', ->
-    it 'should allow to update a component status', (done) ->
+    it 'should have one component set before', (done) ->
       helper.converse @robot, @user, '/cachet component set foo 3', (envelope, response) ->
         assert.include response, 'The component \'foo\' (id = 3) has been set'
+        done()
 
+    it 'should allow to update a component status', (done) ->
       api.put('/components/3', { status: 4 }).reply(200, { data: {
         name: 'foo',
         status_name: 'new status'
@@ -205,7 +217,9 @@ describe 'hubot cachet', ->
     it 'should deal with API errors', (done) ->
       helper.converse @robot, @user, '/cachet component set foo 3', (envelope, response) ->
         assert.include response, 'The component \'foo\' (id = 3) has been set'
+        done()
 
+    it 'should deal with API errors', (done) ->
       api.put('/components/3', { status: 2 }).reply(409)
 
       helper.converse @robot, @user, '/cachet status blue foo', (envelope, response) ->
