@@ -288,7 +288,7 @@ module.exports = (robot) ->
     if not nb?
       nb = 5
 
-    apiRequest msg, 'GET', "/incidents?sort=created_at&order=desc&per_page=#{nb}",
+    apiRequest msg, 'GET', "/incidents?sort=id&per_page=#{nb}",
       {}, (body) ->
         json      = JSON.parse body
         incidents = json.data
