@@ -91,15 +91,17 @@ module.exports = (robot) ->
   ###
   Call the API to declare a new incident
   ###
-  declareIncident = (component_name, incident_name, incident_msg, status, msg, scheduled_at) ->
+  declareIncident = (component_name, component_status, incident_name, incident_msg, status, msg, scheduled_at) ->
     component_id  = _components[component_name] ? 0
     incident_name = component_name if component_id == 0 unless not component_name?
 
     data = {
+      visible: 1,
       name: incident_name,
       message: incident_msg,
       status: status,
       component_id: component_id,
+      component_status: component_status,
       notify: true
     }
 
@@ -223,32 +225,36 @@ module.exports = (robot) ->
     component_name = msg.match[1]
     incident_msg   = msg.match[2]
     incident_name  = "Investigating issue on #{component_name}"
+    component_status = ComponentStatus.PartialOutage
 
-    declareIncident component_name, incident_name, incident_msg, \
+    declareIncident component_name, component_status, incident_name, incident_msg, \
                      IncidentStatus.Investigating, msg
 
   robot.respond /incident identified on ([a-zA-Z0-9 ]+): (.+)/i, (msg) ->
     component_name = msg.match[1]
     incident_msg   = msg.match[2]
     incident_name  = "Issue on #{component_name} has been identified"
+    component_status = ComponentStatus.MajorOutage
 
-    declareIncident component_name, incident_name, incident_msg, \
+    declareIncident component_name, component_status, incident_name, incident_msg, \
                      IncidentStatus.Identified, msg
 
   robot.respond /incident watching on ([a-zA-Z0-9 ]+): (.+)/i, (msg) ->
     component_name = msg.match[1]
     incident_msg   = msg.match[2]
     incident_name  = "Watching #{component_name}"
+    component_status = ComponentStatus.PerformanceIssue
 
-    declareIncident component_name, incident_name, incident_msg, \
+    declareIncident component_name, component_status, incident_name, incident_msg, \
                      IncidentStatus.Watching, msg
 
   robot.respond /incident fixed on ([a-zA-Z0-9 ]+): (.+)/i, (msg) ->
     component_name = msg.match[1]
     incident_msg   = msg.match[2]
     incident_name  = "#{component_name} is back!"
+    component_status = ComponentStatus.Operational
 
-    declareIncident component_name, incident_name, incident_msg, \
+    declareIncident component_name, component_status, incident_name, incident_msg, \
                      IncidentStatus.Fixed, msg
 
   robot.respond /cachet maintenance at (\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) (.+): (.+)/i, (msg) ->
