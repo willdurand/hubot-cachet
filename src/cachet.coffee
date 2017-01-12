@@ -262,7 +262,7 @@ module.exports = (robot) ->
     incident_name = msg.match[2]
     incident_msg  = msg.match[3]
 
-    declareIncident null, incident_name, incident_msg, \
+    declareIncident null, null, incident_name, incident_msg, \
                      IncidentStatus.Scheduled, msg, scheduled_at
 
   robot.respond /incident #?([0-9]+) update name: (.+)/i, (msg) ->
