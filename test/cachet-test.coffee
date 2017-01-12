@@ -95,10 +95,12 @@ describe 'hubot cachet', ->
   describe 'incident investigating on <component name>: <incident message>', ->
     it 'should allow to declare "investigating" incidents', (done) ->
       json = {
+        visible:1,
         name:"foo",
         message:"msg",
         status:1,
         component_id:0,
+        component_status:3,
         notify:true
       }
 
@@ -111,10 +113,12 @@ describe 'hubot cachet', ->
   describe 'incident identified on <component name>: <incident message>', ->
     it 'should allow to declare "identified" incidents', (done) ->
       json = {
+        visible:1,
         name:"foo",
         message:"msg",
         status:2,
         component_id:0,
+        component_status:4,
         notify:true
       }
 
@@ -127,10 +131,12 @@ describe 'hubot cachet', ->
   describe 'incident watching on <component name>: <incident message>', ->
     it 'should allow to declare "watching" incidents', (done) ->
       json = {
+        visible:1,
         name:"foo",
         message:"msg",
         status:3,
         component_id:0,
+        component_status:2,
         notify:true
       }
 
@@ -143,10 +149,12 @@ describe 'hubot cachet', ->
   describe 'incident fixed on <component name>: <incident message>', ->
     it 'should allow to declare "fixed" incidents', (done) ->
       json = {
+        visible:1,
         name:"foo",
         message:"msg",
         status:4,
         component_id:0,
+        component_status:1,
         notify:true
       }
 
@@ -164,10 +172,12 @@ describe 'hubot cachet', ->
 
     it 'should allow to declare incidents on known components', (done) ->
       json = {
+        visible:1,
         name:"foo is back!",
         message:"msg",
         status:4,
         component_id:3,
+        component_status:1,
         notify:true
       }
 
@@ -185,10 +195,12 @@ describe 'hubot cachet', ->
 
     it 'should deal with API errors', (done) ->
       json = {
+        visible:1,
         name:"foo is back!",
         message:"msg",
         status:4,
         component_id:3,
+        component_status:1,
         notify:true
       }
 
@@ -229,10 +241,12 @@ describe 'hubot cachet', ->
   describe 'cachet maintenance at <scheduled_at> <name>: <message>', ->
     it 'should create a new maintenance', (done) ->
       json = {
+        visible:1,
         name:"Foo is upgraded",
         message:"This is a maintenance message",
         status:0,
         component_id:0,
+        component_status:1,
         notify:true,
         scheduled_at: '2015-08-15 10:00:00'
       }
@@ -363,7 +377,7 @@ describe 'hubot cachet', ->
       ]
 
       api
-        .get('/incidents?sort=created_at&order=desc&per_page=2')
+        .get('/incidents?sort=id&per_page=2')
         .reply(200, { data: incidents })
 
       helper.converse @robot, @user, '/incident last 2', (envelope, response) ->
@@ -383,7 +397,7 @@ describe 'hubot cachet', ->
       ]
 
       api
-        .get('/incidents?sort=created_at&order=desc&per_page=5')
+        .get('/incidents?sort=id&per_page=5')
         .reply(200, { data: incidents })
 
       helper.converse @robot, @user, '/incident last', (envelope, response) ->
@@ -398,7 +412,7 @@ describe 'hubot cachet', ->
 
     it 'should say when there are no incidents', (done) ->
       api
-        .get('/incidents?sort=created_at&order=desc&per_page=5')
+        .get('/incidents?sort=id&per_page=5')
         .reply(200, { data: [] })
 
       helper.converse @robot, @user, '/incident last 5', (envelope, response) ->
@@ -406,7 +420,7 @@ describe 'hubot cachet', ->
         done()
 
     it 'should deal with API errors', (done) ->
-      api.get('/incidents?sort=created_at&order=desc&per_page=5').reply(500)
+      api.get('/incidents?sort=id&per_page=5').reply(500)
 
       helper.converse @robot, @user, '/incident last', (envelope, response) ->
         assert.equal response, 'The request to the API has failed (status code = 500)'
