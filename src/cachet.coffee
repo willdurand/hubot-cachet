@@ -110,7 +110,7 @@ module.exports = (robot) ->
 
     data = JSON.stringify data
 
-    apiRequest msg, 'POST', '/api/v1/incidents', data, (body) ->
+    apiRequest msg, 'POST', '/incidents', data, (body) ->
       json     = JSON.parse body
       incident = json.data
 
@@ -125,7 +125,7 @@ module.exports = (robot) ->
   updateIncident = (incident_id, data, msg) ->
     data = JSON.stringify data
 
-    apiRequest msg, 'PUT', "/api/v1/incidents/#{incident_id}", data, (body) ->
+    apiRequest msg, 'PUT', "/incidents/#{incident_id}", data, (body) ->
       json     = JSON.parse body
       incident = json.data
 
@@ -154,7 +154,7 @@ module.exports = (robot) ->
 
     data = JSON.stringify { status: status }
 
-    apiRequest msg, 'PUT', "/api/v1/components/#{component_id}", data, (body) ->
+    apiRequest msg, 'PUT', "/components/#{component_id}", data, (body) ->
       json     = JSON.parse body
       component = json.data
 
@@ -175,7 +175,7 @@ module.exports = (robot) ->
     changeComponentStatus component_name, status, msg
 
   robot.respond /cachet component status/i, (msg) ->
-    apiRequest msg, 'GET', '/api/v1/components', {}, (body) ->
+    apiRequest msg, 'GET', '/components', {}, (body) ->
       json = JSON.parse body
 
       results = []
@@ -294,7 +294,7 @@ module.exports = (robot) ->
     if not nb?
       nb = 5
 
-    apiRequest msg, 'GET', "/api/v1/incidents?sort=id&per_page=#{nb}",
+    apiRequest msg, 'GET', "/incidents?sort=id&per_page=#{nb}",
       {}, (body) ->
         json      = JSON.parse body
         incidents = json.data
