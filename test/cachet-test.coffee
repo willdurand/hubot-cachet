@@ -246,7 +246,7 @@ describe 'hubot cachet', ->
         message:"This is a maintenance message",
         status:0,
         component_id:0,
-        component_status:"null",
+        component_status:1,
         notify:true,
         scheduled_at: '2015-08-15 10:00:00'
       }
